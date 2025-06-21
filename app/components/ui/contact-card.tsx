@@ -14,7 +14,7 @@ export const ContactCard: React.FC = () => {
   };
 
   return (
-    <div className="w-96 h-96  rounded-lg p-8 flex flex-col justify-center items-center text-black font-mono">
+    <div className="w-96 h-96  rounded-lg p-8 flex flex-col justify-center items-start text-black font-mono">
       <h2 className="text-xl font-bold mb-8 text-center">Adithya Krishnan</h2>
       
       <div className="space-y-4 text-sm">

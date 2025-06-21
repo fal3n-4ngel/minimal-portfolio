@@ -137,7 +137,7 @@ export const DigitalSignaturePad: React.FC = () => {
 
 
   return (
-    <div className={`${themeClasses[theme]}  font-mono h-fit flex flex-col transition-colors duration-300 w-full h-full`}>
+    <div className={`${themeClasses[theme]}  font-mono flex flex-col transition-colors duration-300 w-full h-[98%] mt-0`}>
       {/* Header */}
       <div className={`${headerThemes[theme]} border-b p-2 text-xs transition-colors duration-300`}>
         <div className="flex justify-between items-center">

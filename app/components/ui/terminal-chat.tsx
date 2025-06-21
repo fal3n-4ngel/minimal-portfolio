@@ -114,6 +114,8 @@ export const TerminalChat: React.FC<TerminalChatProps> = ({
 
         setUserId(finalUserId);
         setUsername(finalUsername);
+        console.log("User initialized:", finalUsername, finalUserId);
+        console.log("User Connected at:", Date.now());
         setConnectionTime(Date.now());
       } catch (error) {
         console.error("Error initializing user:", error);
