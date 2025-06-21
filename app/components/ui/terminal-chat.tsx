@@ -35,6 +35,7 @@ export const TerminalChat: React.FC<TerminalChatProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [isUserInitialized, setIsUserInitialized] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const [username, setUsername] = useState<string>("");
@@ -48,9 +49,12 @@ export const TerminalChat: React.FC<TerminalChatProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const messagesListenerRef = useRef<(() => void) | null>(null);
   const lastActiveUsersUpdate = useRef<number>(0);
+  const initializationRetryCount = useRef<number>(0);
+  const maxRetries = 3;
 
   const loadingSequence: string[] = [
     "Connecting to terminal...",
+    "Initializing user...",
     "Loading chat history...",
     "Establishing connection...",
     "Ready.",
@@ -62,7 +66,7 @@ export const TerminalChat: React.FC<TerminalChatProps> = ({
     // Only update active users every 5 seconds to reduce calculations
     if (now - lastActiveUsersUpdate.current < 5000) return;
     
-    const fiveSecAgo = now - 5 *  1000;
+    const fiveSecAgo = now - 5 * 1000;
     const recentUsers = new Set<string>();
     
     // Only count users from messages in the last 5 sec
@@ -83,51 +87,91 @@ export const TerminalChat: React.FC<TerminalChatProps> = ({
     lastActiveUsersUpdate.current = now;
   }, [messages]);
 
-  useEffect(() => {
-    const initializeUser = async () => {
+  const initializeUser = async (): Promise<boolean> => {
+    try {
+      const userIdentifier = await getUserIdentifier();
+      const storedUsername = localStorage.getItem(
+        `terminal_username_${userIdentifier}`
+      );
+      const storedUserId = localStorage.getItem(
+        `terminal_userid_${userIdentifier}`
+      );
+
+      let finalUsername, finalUserId;
+
+      if (storedUsername && storedUserId) {
+        finalUsername = storedUsername;
+        finalUserId = storedUserId;
+      } else {
+        finalUserId = generateUserId();
+        finalUsername = generateAnonymousName();
+        localStorage.setItem(
+          `terminal_username_${userIdentifier}`,
+          finalUsername
+        );
+        localStorage.setItem(
+          `terminal_userid_${userIdentifier}`,
+          finalUserId
+        );
+      }
+
+      // Validate that we have proper values
+      if (!finalUsername || !finalUserId || finalUsername.trim() === '' || finalUserId.trim() === '') {
+        throw new Error('Failed to generate valid username or userId');
+      }
+
+      setUserId(finalUserId);
+      setUsername(finalUsername);
+      setConnectionTime(Date.now());
+      console.log("User initialized:", finalUsername, finalUserId);
+      console.log("User Connected at:", Date.now());
+      
+      return true;
+    } catch (error) {
+      console.error("Error initializing user:", error);
+      
+      // Fallback with session-only storage
       try {
-        const userIdentifier = await getUserIdentifier();
-        const storedUsername = localStorage.getItem(
-          `terminal_username_${userIdentifier}`
-        );
-        const storedUserId = localStorage.getItem(
-          `terminal_userid_${userIdentifier}`
-        );
-
-        let finalUsername, finalUserId;
-
-        if (storedUsername && storedUserId) {
-          finalUsername = storedUsername;
-          finalUserId = storedUserId;
-        } else {
-          finalUserId = generateUserId();
-          finalUsername = generateAnonymousName();
-          localStorage.setItem(
-            `terminal_username_${userIdentifier}`,
-            finalUsername
-          );
-          localStorage.setItem(
-            `terminal_userid_${userIdentifier}`,
-            finalUserId
-          );
-        }
-
-        setUserId(finalUserId);
-        setUsername(finalUsername);
-        console.log("User initialized:", finalUsername, finalUserId);
-        console.log("User Connected at:", Date.now());
-        setConnectionTime(Date.now());
-      } catch (error) {
-        console.error("Error initializing user:", error);
         const sessionUserId = generateUserId();
         const sessionUsername = generateAnonymousName();
+        
+        if (!sessionUsername || !sessionUserId || sessionUsername.trim() === '' || sessionUserId.trim() === '') {
+          throw new Error('Failed to generate fallback credentials');
+        }
+        
         setUserId(sessionUserId);
         setUsername(sessionUsername);
         setConnectionTime(Date.now());
+        console.log("User initialized (session only):", sessionUsername, sessionUserId);
+        console.log("User Connected at:", Date.now());
+        
+        return true;
+      } catch (fallbackError) {
+        console.error("Error with fallback initialization:", fallbackError);
+        return false;
+      }
+    }
+  };
+
+  useEffect(() => {
+    const attemptInitialization = async () => {
+      const success = await initializeUser();
+      
+      if (success) {
+        setIsUserInitialized(true);
+        initializationRetryCount.current = 0;
+      } else {
+        initializationRetryCount.current++;
+        
+        if (initializationRetryCount.current < maxRetries) {
+          console.log(`Retrying user initialization (${initializationRetryCount.current}/${maxRetries})...`);
+          setTimeout(attemptInitialization, 1000); // Retry after 1 second
+        } else {
+          console.error("Failed to initialize user after maximum retries");
+          // You might want to show an error state here
+        }
       }
     };
-
-    initializeUser();
 
     let currentStep = 0;
     const loadingInterval = setInterval(() => {
@@ -143,11 +187,19 @@ export const TerminalChat: React.FC<TerminalChatProps> = ({
       }
     }, 600);
 
+    attemptInitialization();
+
     return () => clearInterval(loadingInterval);
   }, []);
 
   useEffect(() => {
-    if (!isConnected) return;
+    // Only proceed if both connection is established AND user is properly initialized
+    if (!isConnected || !isUserInitialized || !username || !userId) {
+      console.log("Waiting for initialization:", { isConnected, isUserInitialized, username: !!username, userId: !!userId });
+      return;
+    }
+
+    console.log("Setting up message listener - user fully initialized");
 
     const setupMessageListener = async () => {
       // First, load initial messages with a single read
@@ -170,11 +222,11 @@ export const TerminalChat: React.FC<TerminalChatProps> = ({
               userId: data[key].userId,
               timestamp: data[key].timestamp,
             }))
-            .filter((msg) => msg.timestamp> connectionTime-5000)
-            ;
-            console.log("Initial messages loaded:", initialMessages);
-            console.log("Connection time:", connectionTime);
-            console.log("Current time:", Date.now());
+            .filter((msg) => msg.timestamp > connectionTime - 5000);
+            
+          console.log("Initial messages loaded:", initialMessages);
+          console.log("Connection time:", connectionTime);
+          console.log("Current time:", Date.now());
 
           setMessages(initialMessages);
           
@@ -206,7 +258,6 @@ export const TerminalChat: React.FC<TerminalChatProps> = ({
         messagesRef,
         orderByChild("timestamp"),
         (lastMessageTimestamp > 0 ? startAt(lastMessageTimestamp + 1) : startAt(connectionTime + 1))
-         // Start listening for messages after the last loaded message
       );
 
       const unsubscribe = onValue(newMessagesQuery, (snapshot) => {
@@ -259,7 +310,7 @@ export const TerminalChat: React.FC<TerminalChatProps> = ({
         messagesListenerRef.current();
       }
     };
-  }, [isConnected, maxMessages]);
+  }, [isConnected, isUserInitialized, username, userId, maxMessages, connectionTime]);
 
   // Update active users count periodically instead of on every message
   useEffect(() => {
@@ -273,14 +324,16 @@ export const TerminalChat: React.FC<TerminalChatProps> = ({
   }, [messages]);
 
   const sendMessage = async (): Promise<void> => {
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || !isUserInitialized || !username || !userId) {
+      console.log("Cannot send message - user not properly initialized");
+      return;
+    }
 
     const messageText = inputValue.trim();
     setInputValue("");
 
     try {
       const messagesRef = ref(rtdb, "messages");
-      // Optimized: Use serverTimestamp() directly instead of multiple calls
       await push(messagesRef, {
         text: messageText,
         username: username,
@@ -314,7 +367,7 @@ export const TerminalChat: React.FC<TerminalChatProps> = ({
     }
   };
 
-  if (isLoading) {
+  if (isLoading || !isUserInitialized) {
     return (
       <div
         className={`bg-white text-black font-mono flex items-center justify-center ${className}`}
@@ -416,10 +469,12 @@ export const TerminalChat: React.FC<TerminalChatProps> = ({
               className="flex-1 bg-transparent border-none outline-none text-xs text-black placeholder-gray-400 focus:bg-gray-50 px-1 py-0.5 rounded"
               placeholder="Type a message..."
               autoComplete="off"
+              disabled={!isUserInitialized || !username || !userId}
             />
             <button
               onClick={sendMessage}
-              className="text-gray-600 hover:text-black transition-colors text-xs px-1 py-0.5 border border-gray-300 rounded hover:bg-gray-100 font-medium"
+              disabled={!isUserInitialized || !username || !userId}
+              className="text-gray-600 hover:text-black transition-colors text-xs px-1 py-0.5 border border-gray-300 rounded hover:bg-gray-100 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               send
             </button>
