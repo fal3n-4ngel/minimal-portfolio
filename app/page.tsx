@@ -19,7 +19,7 @@ export default function Home() {
     >
       
       <motion.div 
-        className="fixed top-6 right-6 z-50"
+        className="fixed top-6 right-6 z-50 md:block hidden"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
@@ -31,6 +31,22 @@ export default function Home() {
             whileTap={{ scale: 0.95 }}
           >
             View Moodboard →
+          </motion.button>
+        </Link>
+      </motion.div>
+      <motion.div 
+        className="fixed top-6 right-6 z-50 block md:hidden"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+      >
+        <Link href="https://www.adithyakrishnan.com/">
+          <motion.button
+            className="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors duration-200 shadow-lg backdrop-blur-sm"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            View Portfolio →
           </motion.button>
         </Link>
       </motion.div>
