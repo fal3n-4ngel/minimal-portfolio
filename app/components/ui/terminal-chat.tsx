@@ -183,15 +183,13 @@ export const TerminalChat: React.FC<TerminalChatProps> = ({
         setTimeout(() => {
           setIsLoading(false);
           setIsConnected(true);
+           setConnectionTime(Date.now());
         }, 500);
       }
     }, 600);
 
     attemptInitialization();
-    if (!isConnected || !isUserInitialized || !username || !userId) {
-      console.log("Waiting for initialization:", { isConnected, isUserInitialized, username: !!username, userId: !!userId });
-      attemptInitialization();
-    }
+  
 
     return () => clearInterval(loadingInterval);
   }, []);
