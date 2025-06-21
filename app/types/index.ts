@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore"
+
 export interface PersonalInfo {
   name: string
   title: string
@@ -35,4 +37,23 @@ export interface ResumeData {
   clientProjects: Project[]
   experiences: Experience[]
   awards: Award[]
+}
+
+export // Types
+interface Message {
+  id: string;
+  text: string;
+  username: string;
+  userId: string;
+  timestamp: Timestamp | null;
+}
+
+export interface FirebaseConfig {
+  apiKey: string;
+  authDomain: string;
+  projectId: string;
+  storageBucket: string;
+  messagingSenderId: string;
+  appId: string;
+  measurementId: string;
 }
