@@ -188,6 +188,10 @@ export const TerminalChat: React.FC<TerminalChatProps> = ({
     }, 600);
 
     attemptInitialization();
+    if (!isConnected || !isUserInitialized || !username || !userId) {
+      console.log("Waiting for initialization:", { isConnected, isUserInitialized, username: !!username, userId: !!userId });
+      attemptInitialization();
+    }
 
     return () => clearInterval(loadingInterval);
   }, []);
