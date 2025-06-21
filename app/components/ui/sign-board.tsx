@@ -153,7 +153,7 @@ export const DigitalSignaturePad: React.FC = () => {
       
       {/* Canvas Area */}
       <div className="flex-1 p-4 flex items-center justify-center">
-        <div className="w-full h-full max-w-2xl max-h-96 relative">
+        <div className="w-full h-full max-w-2xl max-h-80 relative">
           <canvas
             ref={canvasRef}
             className={`w-full h-full border-2 cursor-crosshair rounded ${
