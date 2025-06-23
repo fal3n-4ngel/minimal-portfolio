@@ -225,9 +225,9 @@ const TechNews: React.FC = () => {
     fetchNews(true); // Force refresh
   };
 
-  const getRemainingRequests = (): number => {
-    return Math.max(0, MAX_REQUESTS_PER_HOUR - requestCount);
-  };
+  // const getRemainingRequests = (): number => {
+  //   return Math.max(0, MAX_REQUESTS_PER_HOUR - requestCount);
+  // };
 
   const getTimeUntilNextRefresh = (): string => {
     const now = Date.now();
@@ -237,18 +237,18 @@ const TechNews: React.FC = () => {
     return formatCountdown(timeLeft);
   };
 
-  const getCacheStatus = (): string => {
-    if (news.length === 0) return "No cache";
+  // const getCacheStatus = (): string => {
+  //   if (news.length === 0) return "No cache";
     
-    const cached = loadFromCache();
-    if (!cached) return "No cache";
+  //   const cached = loadFromCache();
+  //   if (!cached) return "No cache";
     
-    const cacheAge = Date.now() - cached.timestamp;
-    const remaining = CACHE_DURATION - cacheAge;
+  //   const cacheAge = Date.now() - cached.timestamp;
+  //   const remaining = CACHE_DURATION - cacheAge;
     
-    if (remaining <= 0) return "Cache expired";
-    return `Cache: ${formatCountdown(remaining)} left`;
-  };
+  //   if (remaining <= 0) return "Cache expired";
+  //   return `Cache: ${formatCountdown(remaining)} left`;
+  // };
 
   return (
     <div className="bg-white font-mono text-sm h-full flex flex-col">
@@ -271,13 +271,13 @@ const TechNews: React.FC = () => {
         </button>
       </div>
 
-      {/* Cache and Rate Limit Info */}
+      {/* Cache and Rate Limit Info
       <div className="px-2 py-1 bg-yellow-50 border-b border-gray-200 text-xs text-gray-600">
         <div className="flex justify-between">
           <span>Remaining requests: {getRemainingRequests()}</span>
           <span>Auto-refresh: {CACHE_DURATION / (1000 * 60)}min | {getCacheStatus()}</span>
         </div>
-      </div>
+      </div> */}
 
       {/* Content */}
       <div className="flex-1 p-2 overflow-y-auto space-y-2 min-h-0">
