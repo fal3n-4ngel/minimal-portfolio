@@ -3,33 +3,40 @@
 import { footerVariants } from '@/app/lib/animations'
 import { motion } from 'framer-motion'
 
-
 export default function FooterSection() {
   return (
     <motion.footer
-      className="border-t border-neutral-200 pt-8"
       variants={footerVariants}
+      style={{
+        marginTop: '48px',
+        paddingTop: '20px',
+        borderTop: '1px solid var(--border-subtle)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '8px',
+      }}
     >
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="text-neutral-500 text-sm">
-          <p>Simple resume format for recruiters/clients and quick reference.</p>
-          <p className="mt-1">
-            For a complete portfolio experience, visit{' '}
-            <motion.a
-              href="https://www.adithyakrishnan.com"
-              className="text-neutral-700 hover:text-neutral-900 transition-colors duration-200"
-              whileHover={{ y: -1 }}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              adithyakrishnan.com
-            </motion.a>
-          </p>
-        </div>
-        <div className="text-neutral-400 text-sm">
-          © 2025 Adithya Krishnan. All rights reserved.
-        </div>
-      </div>
+      <p style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--fg-subtle)', letterSpacing: '0.03em' }}>
+        © {new Date().getFullYear()} Adithya Krishnan
+      </p>
+      <a
+        href="https://www.adithyakrishnan.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '11px',
+          color: 'var(--fg-subtle)',
+          letterSpacing: '0.03em',
+          transition: 'color 0.15s',
+        }}
+        onMouseEnter={e => (e.currentTarget.style.color = 'var(--fg)')}
+        onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg-subtle)')}
+      >
+        adithyakrishnan.com ↗
+      </a>
     </motion.footer>
   )
 }

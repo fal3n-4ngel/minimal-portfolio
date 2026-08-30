@@ -3,61 +3,82 @@
 import { resumeData } from '@/app/data/resume-data'
 import { itemVariants } from '@/app/lib/animations'
 import { motion } from 'framer-motion'
-import Image from 'next/image'
-import AnimatedLink from '../ui/animated-link'
-import { ibmPlexSans } from '@/app/fonts'
-
 
 export default function HeaderSection() {
-  const { personalInfo, socialLinks } = resumeData
+  const { personalInfo } = resumeData
 
   return (
-    <motion.header className="mb-16" variants={itemVariants}>
-      <motion.div
-        className="flex items-center gap-4 mb-6"
-        variants={itemVariants}
-      >
-        <motion.div
-          className="w-26 h-26 rounded-full flex items-center justify-center"
-          whileHover={{ scale: 1.05 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        >
-          <Image
-            src={personalInfo.profileImage}
-            alt={personalInfo.name}
-            width={96}
-            height={96}
-            className="w-24 h-24 rounded-full"
-            priority
-          />
-        </motion.div>
-      </motion.div>
-
+    <motion.header variants={itemVariants}>
+      {/* Name */}
       <motion.h1
-        className={`text-neutral-900 font-medium text-xl mb-4 ${ibmPlexSans.className}`}
         variants={itemVariants}
+        style={{
+          fontSize: '22px',
+          fontWeight: 600,
+          color: 'var(--fg)',
+          letterSpacing: '-0.02em',
+          marginBottom: '12px',
+          lineHeight: 1.2,
+        }}
       >
-        {personalInfo.title }
+        {personalInfo.name}
       </motion.h1>
 
-      {personalInfo.description.map((paragraph, index) => (
+      {/* Bio */}
+      {personalInfo.description.map((p, i) => (
         <motion.p
-          key={index}
-          className={`text-neutral-600 mb-4 leading-relaxed  ${ibmPlexSans.className}`}
+          key={i}
           variants={itemVariants}
-
+          style={{
+            fontSize: '13.5px',
+            color: 'var(--fg-muted)',
+            lineHeight: '1.7',
+            maxWidth: '540px',
+            marginBottom: '20px',
+          }}
         >
-          {paragraph}
+          {p}
         </motion.p>
       ))}
 
-      <motion.div
-        className="flex flex-wrap gap-6 text-sm mt-6"
-        variants={itemVariants}
-      >
-        {socialLinks.map((link, index) => (
-          <AnimatedLink key={link.text} link={link} index={index} />
-        ))}
+      {/* Download PDF */}
+      <motion.div variants={itemVariants} style={{ marginBottom: '36px' }}>
+        <a
+          href="https://www.adithyakrishnan.com/Resume%20Adithya%20Krishnan.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="download-btn"
+        >
+          <span style={{ fontSize: '14px' }}>⬇</span>
+          Download PDF
+        </a>
+      </motion.div>
+
+      {/* Contact section */}
+      <motion.div variants={itemVariants}>
+        <h2 className="cv-section-title">Contact</h2>
+        <div>
+          {[
+            { label: 'Email', value: 'hello@adithyakrishnan.com', href: 'mailto:hello@adithyakrishnan.com' },
+            { label: 'LinkedIn', value: 'fal3n-4ngel', href: 'https://www.linkedin.com/in/fal3n-4ngel' },
+            { label: 'GitHub', value: 'fal3n-4ngel', href: 'https://github.com/fal3n-4ngel' },
+          ].map((item) => (
+            <div key={item.label} className="contact-row">
+              <span className="contact-label">{item.label}</span>
+              <a
+                href={item.href}
+                target={item.href.startsWith('mailto') ? '_self' : '_blank'}
+                rel="noopener noreferrer"
+                className="contact-value"
+                style={{ transition: 'color 0.15s' }}
+                onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg)')}
+              >
+                {item.value}
+              </a>
+            </div>
+          ))}
+        </div>
       </motion.div>
     </motion.header>
   )

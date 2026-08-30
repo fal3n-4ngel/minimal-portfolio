@@ -2,36 +2,44 @@
 
 import { resumeData } from '@/app/data/resume-data'
 import { motion } from 'framer-motion'
-import SectionHeader from '../ui/section-header'
 import { itemVariants, sectionVariants } from '@/app/lib/animations'
-
 
 export default function ExperienceSection() {
   const { experiences } = resumeData
 
   return (
-    <motion.section className="mb-16" variants={sectionVariants}>
-      <SectionHeader>Experience.</SectionHeader>
+    <motion.div variants={sectionVariants}>
+      <h2 className="cv-section-title">Work Experience</h2>
 
-      <div className="space-y-6">
-        {experiences.map((experience, index) => (
+      <div>
+        {experiences.map((exp, index) => (
           <motion.div
             key={index}
             variants={itemVariants}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="exp-row"
           >
-            <h3 className="text-neutral-900 font-medium mb-1">
-              {experience.title}
-            </h3>
-            <p className="text-neutral-500 text-sm mb-2">
-              {experience.period}
-            </p>
-            <p className="text-neutral-600 text-sm leading-relaxed">
-              {experience.description}
-            </p>
+            {/* Company logo square */}
+            <span
+              className="exp-logo"
+              style={{ background: exp.logoColor ?? '#0d0d0d', borderRadius: '6px' }}
+            >
+              {exp.logoInitial}
+            </span>
+
+            {/* Company name with ↗ */}
+            <span className="exp-company">
+              {exp.company}
+              <sup>↗</sup>
+            </span>
+
+            {/* Role */}
+            <span className="exp-role">{exp.title}</span>
+
+            {/* Period — right-aligned, muted */}
+            <span className="exp-period">{exp.period}</span>
           </motion.div>
         ))}
       </div>
-    </motion.section>
+    </motion.div>
   )
 }

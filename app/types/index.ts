@@ -21,8 +21,12 @@ export interface Project {
 
 export interface Experience {
   title: string
+  company: string
   period: string
   description: string
+  logoColor?: string
+  logoInitial?: string
+  logoUrl?:string
 }
 
 export interface Award {

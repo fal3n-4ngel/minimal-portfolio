@@ -1,6 +1,5 @@
 "use client";
 
-import { ibmPlexSans } from "@/app/fonts";
 import { projectVariants } from "@/app/lib/animations";
 import { Project } from "@/app/types";
 import { motion } from "framer-motion";
@@ -16,18 +15,19 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
   return (
     <motion.div
-      className={`cursor-pointer p-2  rounded-lg  ${ibmPlexSans.className}  transition-all group`}
+      className="cursor-pointer py-2.5 px-0 border-b border-neutral-100 last:border-b-0 group"
       variants={projectVariants}
-      whileHover={{
-        backgroundColor: "#fdfdfd",
-        transition: { duration: 0.2 },
-      }}
       onClick={handleClick}
     >
-      <h3 className="text-neutral-900 font-medium text-sm mb-2 group-hover:underline underline-offset-2">
-        {project.title}
-      </h3>
-      <p className="text-neutral-600 text-sm leading-relaxed">
+      <div className="flex items-center justify-between">
+        <h3 className="text-neutral-800 font-medium text-sm group-hover:underline underline-offset-2 transition-all">
+          {project.title}
+        </h3>
+        <span className="text-neutral-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          ↗
+        </span>
+      </div>
+      <p className="text-neutral-500 text-xs leading-relaxed mt-0.5">
         {project.description}
       </p>
     </motion.div>

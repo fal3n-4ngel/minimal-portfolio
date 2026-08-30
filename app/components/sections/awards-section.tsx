@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import SectionHeader from "../ui/section-header";
 import { resumeData } from "@/app/data/resume-data";
 import { itemVariants, sectionVariants } from "@/app/lib/animations";
 
@@ -9,23 +8,28 @@ export default function AwardsSection() {
   const { awards } = resumeData;
 
   return (
-    <motion.section className="mb-16" variants={sectionVariants}>
-      <SectionHeader>Awards.</SectionHeader>
+    <motion.div variants={sectionVariants}>
+      <h2 className="cv-section-title">Recognition</h2>
 
-      <div className="space-y-4">
+      <div>
         {awards.map((award, index) => (
           <motion.div
             key={index}
             variants={itemVariants}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="award-row"
           >
-            <h3 className="text-neutral-900 font-medium text-sm mb-1">
-              {award.title}
-            </h3>
-            <p className="text-neutral-500 text-sm">{award.organization}</p>
+            <span className="award-dot" />
+            <div>
+              <p style={{ fontSize: "13.5px", fontWeight: 500, color: "var(--fg)", marginBottom: "2px" }}>
+                {award.title}
+              </p>
+              <p style={{ fontSize: "12px", color: "var(--fg-subtle)", fontFamily: "var(--font-mono)", letterSpacing: "0.02em" }}>
+                {award.organization}
+              </p>
+            </div>
           </motion.div>
         ))}
       </div>
-    </motion.section>
+    </motion.div>
   );
 }

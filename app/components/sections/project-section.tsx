@@ -1,36 +1,38 @@
 'use client'
 
 import { resumeData } from '@/app/data/resume-data'
-import { sectionVariants } from '@/app/lib/animations'
 import { motion } from 'framer-motion'
-import SectionHeader from '../ui/section-header'
-import ProjectCard from '../ui/project-card'
-
+import { itemVariants, sectionVariants } from '@/app/lib/animations'
 
 export default function ProjectsSection() {
   const { personalProjects, clientProjects } = resumeData
 
-  return (
-    <motion.section className="mb-16" variants={sectionVariants}>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-        <motion.div variants={sectionVariants}>
-          <SectionHeader>Personal.</SectionHeader>
-          <div className="space-y-1">
-            {personalProjects.map((project) => (
-              <ProjectCard key={project.title} project={project} />
-            ))}
-          </div>
-        </motion.div>
+  const allProjects = [
+    ...personalProjects.map(p => ({ ...p, tag: 'Personal' })),
+    ...clientProjects.map(p => ({ ...p, tag: 'Client' })),
+  ]
 
-        <motion.div variants={sectionVariants}>
-          <SectionHeader>Client.</SectionHeader>
-          <div className="space-y-1">
-            {clientProjects.map((project) => (
-              <ProjectCard key={project.title} project={project} />
-            ))}
-          </div>
-        </motion.div>
+  return (
+    <motion.div variants={sectionVariants}>
+      <h2 className="cv-section-title">Projects</h2>
+
+      <div className="project-grid">
+        {allProjects.map((project, i) => (
+          <motion.a
+            key={project.title}
+            href={project.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="project-card"
+            variants={itemVariants}
+            custom={i}
+          >
+            <div className="project-tag">{project.tag} ↗</div>
+            <div className="project-title">{project.title}</div>
+            <div className="project-desc">{project.description}</div>
+          </motion.a>
+        ))}
       </div>
-    </motion.section>
+    </motion.div>
   )
 }
