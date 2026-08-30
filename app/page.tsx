@@ -53,8 +53,8 @@ export default function Home() {
 
       <HeaderSection />
       <ExperienceSection />
-      <AwardsSection />
       <ProjectsSection />
+      <AwardsSection />
       <FooterSection />
     </motion.div>
   )
